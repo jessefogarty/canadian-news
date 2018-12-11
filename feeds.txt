@@ -1,0 +1,53 @@
+# CBC News
+https://rss.cbc.ca/lineup/topstories.xml
+https://rss.cbc.ca/lineup/world.xml
+https://rss.cbc.ca/lineup/canada.xml
+https://rss.cbc.ca/lineup/politics.xml
+https://rss.cbc.ca/lineup/business.xml
+https://rss.cbc.ca/lineup/health.xml
+https://rss.cbc.ca/lineup/arts.xml
+https://rss.cbc.ca/lineup/technology.xml
+https://rss.cbc.ca/lineup/offbeat.xml
+https://www.cbc.ca/cmlink/rss-cbcaboriginal
+https://rss.cbc.ca/lineup/thenational.xml
+# Toronto Star
+http://www.thestar.com/feeds.topstories.rss
+http://www.thestar.com/feeds.articles.vancouver.rss
+http://www.thestar.com/feeds.articles.calgary.rss
+http://www.thestar.com/feeds.articles.edmonton.rss
+http://www.thestar.com/feeds.articles.halifax.rss
+http://www.thestar.com/feeds.articles.news.rss
+http://www.thestar.com/feeds.articles.news.gta.rss
+http://www.thestar.com/feeds.articles.news.queenspark.rss
+http://www.thestar.com/feeds.articles.news.canada.rss
+http://www.thestar.com/feeds.articles.news.world.rss
+http://www.thestar.com/feeds.articles.news.investigations.rss
+http://www.thestar.com/feeds.articles.news.crime.rss
+http://www.thestar.com/feeds.articles.business.rss
+http://www.thestar.com/feeds.articles.opinion.rss
+# Macleans Magazine
+https://www.macleans.ca/feed/
+# Ottawa Citizen
+https://ottawacitizen.com/feed/
+# Montreal Gazette
+https://montrealgazette.com/feed/
+# Vancouver Sun
+https://vancouversun.com/feed/
+# Financial Post
+https://feeds.feedburner.com/FP_TopStories
+# Toronto Sun
+https://torontosun.com/feed/
+# National Post Top Stories
+https://feeds.feedburner.com/np_top_stories.rss
+# Global news
+https://globalnews.ca/feed/
+# CTV news
+https://www.ctvnews.ca/rss/ctvnews-ca-top-stories-public-rss-1.822009
+# Edmonton Journal
+https://edmontonjournal.com/feed/
+# Vice canada
+https://www.vice.com/en_ca/rss
+# Torontoist
+https://torontoist.com/feed/
+# National Observer
+https://www.nationalobserver.com/front/rss
