@@ -5,6 +5,7 @@ from tqdm import tqdm
 import re
 
 # TODO: remove <img> from desc database column in new method or in next module.
+# TODO: Consider move to feeds.csv w/ source name for sql column
 
 class FeedParser():
     '''
