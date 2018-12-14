@@ -5,7 +5,6 @@ from tqdm import tqdm
 import re
 import time
 # TODO: remove <img> from desc database column in new method or in next module.
-# TODO: Consider move to feeds.csv w/ source name for sql column
 
 class FeedParser():
     '''
@@ -91,9 +90,7 @@ class FeedParser():
         self.conn.close()
         # Finsih run timer
         self.fintime = time.time() - self.st
-        print('Parsed', self.count, 'feeds in:', self.fintime, 'seconds.',
-              file=open('runlog.txt', 'a'))
-        print('Finished. Check runlog for details.')
+        print('Parsed', self.count, 'feeds in:', round(self.fintime, 2), 'seconds.')
 
 if __name__ == "__main__":
     program = FeedParser()

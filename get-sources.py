@@ -5,6 +5,7 @@ import time
 
 class Sources():
     def __init__(self):
+        self.st = time.time()
         self.conn = sqlite3.connect('testdb.db')
         self.cur = self.conn.cursor()
         self.sources = {'cbc.ca':'CBC','thestar.com':'Toronto Star','macleans.ca':'Macleans Magazine',
@@ -15,7 +16,6 @@ class Sources():
                         'edmontonjournal.com':'Edmonton Journal','vice.com':'VICE',
                         'torontoist.com':'Torontoist','nationalobserver.com':'National Observer'}
     def find(self):
-        st = time.time()
         allrows = self.cur.execute('select id, link from articles where source is null').fetchall()
         for row in allrows:
             # Define id : row variables
@@ -25,13 +25,9 @@ class Sources():
                 search = key ; source = value
                 if re.search(search, link):
                     self.cur.execute('update articles set source = ? where id = ?', (source, id))
-            #if re.search('cbc.ca', link):
-                #source = 'CBC'
-                #self.cur.execute('update articles set source = ? where id = ?', (source, id))
-
         self.conn.commit()
         self.conn.close()
-        ft = time.time() - st
+        ft = time.time() - self.st
         print('Finished updating records in', round(ft, 2), 'seconds.')
 
 if __name__ == '__main__':
