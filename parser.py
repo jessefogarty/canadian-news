@@ -3,7 +3,7 @@ import feedparser
 import sqlite3
 from tqdm import tqdm
 import re
-
+import time
 # TODO: remove <img> from desc database column in new method or in next module.
 # TODO: Consider move to feeds.csv w/ source name for sql column
 
@@ -20,6 +20,9 @@ class FeedParser():
         allfeeds : raw read of feeds.txt.
         conn / cur : sqlite3 database connectors.
         '''
+        # Setup run timer - finished in submitentries()
+        self.st = time.time()
+        self.feederror = []
         # Open Feeds.txt
         self.allfeeds = open('feeds.txt', 'r').readlines()
         # Establish DB ConnectionError
@@ -40,7 +43,7 @@ class FeedParser():
         '''
         for feed in self.allfeeds:
             self.count = self.count + 1
-            print(self.count)
+            print('Parsing feed #', self.count)
             # Ignore comment lines
             if re.findall('(^https://.+$)', feed):
                 xmlfeed = feedparser.parse(feed)
@@ -86,6 +89,11 @@ class FeedParser():
         # TODO: add means to print out queued data / add flag for submit.
         self.conn.commit()
         self.conn.close()
+        # Finsih run timer
+        self.fintime = time.time() - self.st
+        print('Parsed', self.count, 'feeds in:', self.fintime, 'seconds.',
+              file=open('runlog.txt', 'a'))
+        print('Finished. Check runlog for details.')
 
 if __name__ == "__main__":
     program = FeedParser()

@@ -1,0 +1,2 @@
+Parsed 53 feeds in: 23.543071031570435 seconds.
+Parsed 53 feeds in: 9.126513957977295 seconds.
