@@ -34,11 +34,11 @@ https://montrealgazette.com/feed/
 # Vancouver Sun
 https://vancouversun.com/feed/
 # Financial Post
-https://feeds.feedburner.com/FP_TopStories
+https://business.financialpost.com/feed/
 # Toronto Sun
 https://torontosun.com/feed/
-# National Post Top Stories
-https://feeds.feedburner.com/np_top_stories.rss
+# National Post
+https://nationalpost.com/feed/
 # Global news
 https://globalnews.ca/feed/
 # CTV news
