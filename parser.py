@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import feedparser
 import sqlite3
-from tqdm import tqdm
+#from tqdm import tqdm
 import re
 import time
 # TODO: remove <img> from desc database column in new method or in next module.
@@ -55,6 +55,8 @@ class FeedParser():
                         link = entry.link
                         pub_date = entry.published
                         desc = entry.description
+                        # strip any html tags from entry.description
+                        desc = re.sub('<[^<]+?>', '', desc)
                         data = (title, link, pub_date, desc)
                         self.cur.execute('''
                                             INSERT OR IGNORE INTO articles
@@ -105,7 +107,6 @@ class FeedParser():
         self.conn.close()
         ft = time.time() - self.st
         print('Finished adding & updating records in', round(ft, 2), 'seconds.')
-
 
 if __name__ == "__main__":
     program = FeedParser()

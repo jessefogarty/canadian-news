@@ -1,14 +1,19 @@
 #!/usr/bin/python3
+'''
+    A small script to clean html tags from entry.description.
+
+    Added regex substitue to main parser script. Archived in cleaner.
+'''
 import sqlite3
 import re
-
-conn = sqlite3.connect('../testdb.db')
+from tqdm import tqdm
+conn = sqlite3.connect('testdb.db')
 cur = conn.cursor()
-
-data = cur.execute('select id, desc, source from articles').fetchall()
-
-for entry in data:
-    id = entry[0] ; desc = entry[1] ; source = entry[2]
-    # change to findall and strip in same line.... No need for search then findall
-    if re.search('<img', desc) and source == 'CBC':
-        print('cbc with img html tag')
+data = cur.execute('select id, desc from articles').fetchall()
+for entry in tqdm(data):
+    id = entry[0] ; desc = entry[1]
+    desc = re.sub('<[^<]+?>', '', desc)
+    cur.execute('update articles set desc = ? where id = ?', (desc, id))
+conn.commit()
+conn.close()
+print('finished')
