@@ -51,3 +51,5 @@ https://www.vice.com/en_ca/rss
 https://torontoist.com/feed/
 # National Observer
 https://www.nationalobserver.com/front/rss
+# 680 News
+https://680news.com/feed
