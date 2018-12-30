@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 import feedparser
 import sqlite3
-#from tqdm import tqdm
+from tqdm import tqdm
 import re
 import time
+from newspaper import Article
 # TODO: remove <img> from desc database column in new method or in next module.
 
 class FeedParser():
@@ -41,9 +42,9 @@ class FeedParser():
         REQUIRED .submitentries()
             commit and close databse connection.
         '''
-        for feed in self.allfeeds:
+        print('Parsing website feeds.')
+        for feed in tqdm(self.allfeeds):
             self.count = self.count + 1
-            print('Parsing feed #', self.count)
             # Ignore comment lines
             if re.findall('(^https://.+$)', feed):
                 xmlfeed = feedparser.parse(feed)
@@ -84,9 +85,11 @@ class FeedParser():
                     except AttributeError:
                         pass
         self.conn.commit()
+        print('Finished parsing website RSS/ATOM feeds.', self.count,
+              'new articles were processed.', '\n')
 
     def getsources(self):
-        print('Updating the source column for articles...')
+        print('Updating/Adding sources for articles.')
         self.sources = {'cbc.ca':'CBC','thestar.com':'Toronto Star','macleans.ca':'Macleans Magazine',
                         'ottawacitizen.com':'Ottawa Citizen','montrealgazette.com':'Montreal Gazette',
                         'vancouversun.com':'Vancouver Sun','financialpost.com':'Financial Post',
@@ -96,7 +99,9 @@ class FeedParser():
                         'torontoist.com':'Torontoist','nationalobserver.com':'National Observer',
                         '680news.com':'680'}
         allrows = self.cur.execute('select id, link from articles where source is null').fetchall()
-        for row in allrows:
+        count = 0
+        for row in tqdm(allrows):
+            count += 1
             # Define id : row variables
             id = row[0] ; link = row[1]
             # use dict to find / add source dynamically
@@ -104,6 +109,26 @@ class FeedParser():
                 search = key ; source = value
                 if re.search(search, link):
                     self.cur.execute('update articles set source = ? where id = ?', (source, id))
+        self.conn.commit()
+        print('Finished adding the sources to', count, 'articles.', '\n')
+
+    def getcontent(self):
+        print('Getting the text for articles in the database.')
+        links = self.cur.execute('select id,link from articles where content is null').fetchall()
+        for link in tqdm(links):
+            id = link[0]
+            url = link[1]
+            # Create Article opbject w/ url & .download()
+            article = Article(url)
+            try:
+                article.download()
+                # Parse article object
+                article.parse()
+                content = article.text
+                updata = (content, id)
+                self.cur.execute('update articles set content = ? where id = ?', updata)
+            except:
+                pass
         self.conn.commit()
         self.conn.close()
         ft = time.time() - self.st
@@ -113,3 +138,4 @@ if __name__ == "__main__":
     program = FeedParser()
     program.getfeed()
     program.getsources()
+    program.getcontent()
