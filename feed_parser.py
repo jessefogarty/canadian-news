@@ -5,16 +5,14 @@ from tqdm import tqdm
 import re
 import time
 from newspaper import Article
-# TODO: remove <img> from desc database column in new method or in next module.
-
+'''
+    A Breif description for the feed_parser
+        - Get title, link, publish date and description from feeds.
+            - Store in DB.
+        - Update / Add article source to each row in database.
+        - Update / Add article content text to each row in database.
+'''
 class FeedParser():
-    '''
-    Retrieve and parse XML/ATOM feeds from Canadian news sources.
-    allfeeds : Text File
-        one feed per line.
-    conn : Database File
-        output to news-articles.db.
-    '''
     def __init__(self):
         '''
         allfeeds : raw read of feeds.txt.

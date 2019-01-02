@@ -7,7 +7,8 @@
 import sqlite3
 import re
 from tqdm import tqdm
-conn = sqlite3.connect('testdb.db')
+print('Removing html tags from desc column')
+conn = sqlite3.connect('../testdb.db')
 cur = conn.cursor()
 data = cur.execute('select id, desc from articles').fetchall()
 for entry in tqdm(data):
