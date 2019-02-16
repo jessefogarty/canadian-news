@@ -5,16 +5,17 @@ from tqdm import tqdm
 import re
 import time
 from newspaper import Article
-# TODO: remove <img> from desc database column in new method or in next module.
+# TODO: make the class more modular
+'''
+    A Breif description for the feed_parser
+        - Get title, link, publish date and description from feeds.
+            - Store in DB.
+        - Update / Add article source to each row in database.
+        - Update / Add article content text to each row in database.
+'''
+
 
 class FeedParser():
-    '''
-    Retrieve and parse XML/ATOM feeds from Canadian news sources.
-    allfeeds : Text File
-        one feed per line.
-    conn : Database File
-        output to news-articles.db.
-    '''
     def __init__(self):
         '''
         allfeeds : raw read of feeds.txt.
@@ -26,9 +27,15 @@ class FeedParser():
         # Open Feeds.txt
         self.allfeeds = open('feeds.txt', 'r').readlines()
         # Establish DB ConnectionError
-        self.conn = sqlite3.connect('testdb.db')
+        self.conn = sqlite3.connect('articles_raw.db')
         self.cur = self.conn.cursor()
         self.count = 0
+        # TODO: add getauthor to getcontent
+        # TODO: remove getauthor_sp 0; remove comment for below
+            # useless when fixed getauthor + getcontent
+        #self.getauthor_sp = self.cur.execute('''select id from articles
+                                #order by id DESC limit 1''').fetchall()[0][0]
+        self.getauthor_sp = 0
 
     def getfeed(self):
         '''
@@ -90,31 +97,44 @@ class FeedParser():
 
     def getsources(self):
         print('Updating/Adding sources for articles.')
-        self.sources = {'cbc.ca':'CBC','thestar.com':'Toronto Star','macleans.ca':'Macleans Magazine',
-                        'ottawacitizen.com':'Ottawa Citizen','montrealgazette.com':'Montreal Gazette',
-                        'vancouversun.com':'Vancouver Sun','financialpost.com':'Financial Post',
-                        'torontosun.com':'Toronto Sun','nationalpost.com':'National Post',
-                        'globalnews.ca':'Global News','ctvnews.ca':'CTV News',
-                        'edmontonjournal.com':'Edmonton Journal','vice.com':'VICE',
-                        'torontoist.com':'Torontoist','nationalobserver.com':'National Observer',
-                        '680news.com':'680'}
-        allrows = self.cur.execute('select id, link from articles where source is null').fetchall()
+        self.sources = {'cbc.ca': 'CBC', 'thestar.com': 'Toronto Star',
+                        'macleans.ca': 'Macleans Magazine',
+                        'ottawacitizen.com': 'Ottawa Citizen',
+                        'montrealgazette.com': 'Montreal Gazette',
+                        'vancouversun.com': 'Vancouver Sun',
+                        'financialpost.com': 'Financial Post',
+                        'torontosun.com': 'Toronto Sun',
+                        'nationalpost.com': 'National Post',
+                        'globalnews.ca': 'Global News',
+                        'ctvnews.ca': 'CTV News',
+                        'edmontonjournal.com': 'Edmonton Journal',
+                        'vice.com': 'VICE',
+                        'torontoist.com': 'Torontoist',
+                        'nationalobserver.com': 'National Observer',
+                        '680news.com ': '680'}
+        allrows = self.cur.execute('''select id, link from articles
+            where source is null''').fetchall()
         count = 0
         for row in tqdm(allrows):
             count += 1
             # Define id : row variables
-            id = row[0] ; link = row[1]
+            id = row[0]
+            link = row[1]
             # use dict to find / add source dynamically
             for key, value in self.sources.items():
-                search = key ; source = value
+                search = key
+                source = value
                 if re.search(search, link):
-                    self.cur.execute('update articles set source = ? where id = ?', (source, id))
+                    self.cur.execute('''
+                          update articles set source = ? where id = ?''',
+                                     (source, id))
         self.conn.commit()
         print('Finished adding the sources to', count, 'articles.', '\n')
 
     def getcontent(self):
         print('Getting the text for articles in the database.')
-        links = self.cur.execute('select id,link from articles where content is null').fetchall()
+        links = self.cur.execute('''
+            select id,link from articles where content is null''').fetchall()
         for link in tqdm(links):
             id = link[0]
             url = link[1]
@@ -126,16 +146,57 @@ class FeedParser():
                 article.parse()
                 content = article.text
                 updata = (content, id)
-                self.cur.execute('update articles set content = ? where id = ?', updata)
+                self.cur.execute('''
+                    update articles set content = ? where id = ?''', updata)
             except:
                 pass
         self.conn.commit()
         self.conn.close()
         ft = time.time() - self.st
-        print('Finished adding & updating records in', round(ft, 2), 'seconds.')
+        print('Finished adding & updating records in',
+              round(ft, 2), 'seconds.')
+
+    def getauthors(self):
+        links = cur.execute('''select id,link from articles where
+         author is null''').fetchall()
+        for link in tqdm(links):
+            id = link[0]
+            # skip row if id is less than starting point (no new rows added)
+            if id > self.getauthor_sp:
+                url = link[1]
+                # Create Article opbject w/ url & .download()
+                article = Article(url)
+                try:
+                    # catch article download errors (404 etc)
+                    article.download()
+                    # Parse article object
+                    article.parse()
+                    authors = article.authors
+                    authors_rev = []
+                    # Clean newspaper authors w/ spaCy NER
+                    for author in authors:
+                        doc = nlp(author)
+                        for ent in doc.ents:
+                            # print(ent.text, ent.label_)
+                            if ent.label_ == 'PERSON':
+                                if ent.text not in authors_rev:
+                                    authors_rev.append(ent.text)
+                    # Only submit DB changes if revised author list contains 1+ name(s)
+                    if len(authors_rev) > 0:
+                        string = ", ".join(authors_rev)
+                        updata = (string, id)
+                        self.cur.execute('''UPDATE articles SET author = ? WHERE id = ? ''', (updata))
+                        count += 1
+                except:
+                    #TODO: Add print to log file - error downloading row = id url = link
+                    pass
+
+        self.conn.commit()
+
 
 if __name__ == "__main__":
     program = FeedParser()
     program.getfeed()
     program.getsources()
     program.getcontent()
+    program.getauthors()
