@@ -4,3 +4,4 @@ include/
 sqlschema.txt
 .ipynb
 .json
+.Python
